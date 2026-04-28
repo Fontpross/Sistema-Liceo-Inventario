@@ -1,0 +1,7 @@
+# Carpetas pesadas que no se suben
+node_modules/
+.env
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
