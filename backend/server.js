@@ -15,8 +15,8 @@ app.use(express.json());
 // Definición de Rutas (Las crearemos a continuación)
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/laboratorio', require('./routes/laboratorio'));
-app.use('/api/biblioteca', require('./routes/biblioteca'));
-app.use('/api/deportes', require('./routes/deportes'));
+app.use('/api/dashboard', require('./routes/dashboard'));
+
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Servidor en puerto ${PORT}`));
