@@ -41,7 +41,7 @@ router.post('/login', [
         const payload = { 
             id: usuario._id,
             nombre: usuario.nombre, 
-            rol: usuario.rol 
+            rol: usuario.rol
         };
 
         const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '8h' });

@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { data, useNavigate } from 'react-router-dom';
 import { Lock, Mail, Eye, EyeOff, Loader2 } from 'lucide-react';
 import Swal from 'sweetalert2';
 import axios from 'axios';
 
 const Login = () => {
+
+  // Variables las cuales utilizaremos dentro de lo que es el Login
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -16,11 +18,13 @@ const Login = () => {
         setLoading(true);
 
         try {
+            // Consulta al servidor por medio del endpoint las credenciales
             const respuesta = await axios.post('http://localhost:5000/api/auth/login', { email, password });
   
             localStorage.setItem('token', respuesta.data.token);
+            localStorage.setItem('name', respuesta.data.usuario.nombre);
 
-            // ALERTA MODERNA
+            // Alerta de inicio de sesion
             await Swal.fire({
                 title: '¡Inicio de Sesión Exitoso!',
                 text: `Hola ${respuesta.data.usuario.nombre}, el sistema está listo.`,
@@ -29,7 +33,7 @@ const Login = () => {
                 timer: 2000, // Se cierra sola en 2 segundos
                 timerProgressBar: true
             });
-
+            
             navigate('/dashboard');
 
         }   catch (error) {
@@ -37,7 +41,8 @@ const Login = () => {
                 // Si express-validator manda errores, vienen en la propiedad 'errores'
                 const listaErrores = error.response?.data?.errores;
                 const mensaje = listaErrores ? listaErrores[0].msg : (error.response?.data?.msg || 'Error');
-                
+            
+            // Alerta de error por credenciales incorrectas 
             Swal.fire({
                 title: 'Error',
                 text: error.response?.data?.msg || 'Credenciales incorrectas',

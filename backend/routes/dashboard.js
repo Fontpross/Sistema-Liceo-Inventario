@@ -2,8 +2,8 @@ const express = require('express');
 const router = express.Router();
 const Usuario = require('../models/Usuario');
 const Lab = require('../models/Laboratorio');
-const Libro = require('../models/Libro');
-const Deporte = require('../models/Deporte');
+const Libro = require('../models/Biblioteca');
+const Deporte = require('../models/Deportes');
 
 router.get('/resumen', async (req, res) => {
     try {

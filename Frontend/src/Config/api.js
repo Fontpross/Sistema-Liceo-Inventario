@@ -1,0 +1,1 @@
+export const ApiRest = 'http://localhost:3000/api/laboratorio'

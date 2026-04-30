@@ -14,8 +14,8 @@ app.use(express.json());
 
 // Definición de Rutas (Las crearemos a continuación)
 app.use('/api/auth', require('./routes/auth'));
-app.use('/api/laboratorio', require('./routes/laboratorio'));
 app.use('/api/dashboard', require('./routes/dashboard'));
+app.use('/api/laboratorio', require('./routes/laboratorio'));
 
 
 const PORT = process.env.PORT || 5000;
