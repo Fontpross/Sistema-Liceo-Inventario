@@ -9,8 +9,8 @@ import {
   Cpu,
   RefreshCw
 } from 'lucide-react';
-//import LaboratorioModal from '../components/LaboratorioModal'; // El que creamos antes
-import { ApiRest } from '../Config/api';
+import LaboratorioModal from '../components/CrudLaboratorio/LaboratorioModal'; // El que creamos antes
+import { ApiRestLab } from '../Config/api';
 
 const Laboratorio = () => {
   const [equipos, setEquipos] = useState([]);
@@ -23,7 +23,7 @@ const Laboratorio = () => {
   const cargarEquipos = async () => {
     setLoading(true);
     try {
-      const response = await fetch(ApiRest, {
+      const response = await fetch(ApiRestLab, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       });
       const data = await response.json();
@@ -43,7 +43,7 @@ const Laboratorio = () => {
   const eliminarEquipo = async (id_pc) => {
     if (window.confirm(`¿Estás seguro de eliminar el equipo con SKU: ${id_pc}?`)) {
       try {
-        await fetch(`http://localhost:5000/api/laboratorio/${id_pc}`, {
+        await fetch(`${ApiRestLab}/${id_pc}`, {
           method: 'DELETE',
           headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
         });
@@ -69,7 +69,7 @@ const Laboratorio = () => {
             <Monitor className="text-indigo-600" size={28} />
             INVENTARIO DE LABORATORIO
           </h1>
-          <p className="text-slate-500 text-sm">Gestión de equipos por SKU y especificaciones técnicas</p>
+          <p className="text-slate-500 text-sm">Gestión de equipos y especificaciones técnicas </p>
         </div>
 
         <button 
@@ -128,7 +128,7 @@ const Laboratorio = () => {
                       <div className="text-xs text-slate-400">{equipo.profesor_cargo}</div>
                     </td>
                     <td className="p-4 text-sm text-slate-600 font-medium">
-                      {equipo.Numero_laboratorio}
+                      {equipo.numero_laboratorio}
                     </td>
                     <td className="p-4">
                       <div className="flex flex-wrap gap-1">
@@ -137,6 +137,12 @@ const Laboratorio = () => {
                         </span>
                         <span className="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded border border-slate-200">
                           {equipo.especificaciones?.ram || 'N/A'} RAM
+                        </span>
+                        <span className="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded border border-slate-200">
+                          {equipo.especificaciones?.almacenamiento || 'N/A'} RAM
+                        </span>
+                        <span className="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded border border-slate-200">
+                          {equipo.especificaciones?.tarjetaGrafica || 'N/A'} RAM
                         </span>
                       </div>
                     </td>

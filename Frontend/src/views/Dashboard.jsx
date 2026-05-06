@@ -1,5 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { ApiRestDash } from '../Config/api';
+import user_img from '../imgs/user_img.jpg';
+import PC_dash from '../imgs/PC_dash.jpg';
+import Libros_dash from '../imgs/Libros_dash.png';
+import Deporte_dash from '../imgs/Deporte_dash.png';
 
 const Dashboard = () => {
     const [data, setData] = useState(null);
@@ -9,7 +14,7 @@ const Dashboard = () => {
         const obtenerResumen = async () => {
             try {
                 const token = localStorage.getItem('token');
-                const res = await axios.get('http://localhost:5000/api/dashboard/resumen', {
+                const res = await axios.get( ApiRestDash, {
                     headers: { 'x-auth-token': token }
                 });
                 setData(res.data);
@@ -31,45 +36,60 @@ const Dashboard = () => {
                 <h1 className="text-2xl font-bold text-gray-800">Panel General</h1>
                 <p className="text-gray-500">Resumen de inventario global</p>
             </header>
+            <br />
+            <section className="flex flex-wrap gap-4 text-center">
 
-            <section className="flex flex-wrap ,justify-start">
                 {/* Usuarios */}
-                <div className="stat-card gray border w-40 h-40">
-                    <div className="stat-icon">👤</div>
-                    <div className="stat-info">
-                        <span className="stat-label">Usuarios</span>
-                        <span className="stat-value">{data.usuarios}</span>
+                <div className="stat-card w-full sm:w-48 h-auto py-6 rounded-2xl border flex flex-col items-center justify-center text-center shadow-sm bg-white">
+                {/* Contenedor de imagen: más pequeña en móvil, tamaño normal en tablet/pc */}
+                <div className="stat-icon w-12 h-12 sm:w-16 sm:h-16 flex items-center justify-center mb-3 sm:mb-4">
+                    <img src={user_img} alt="imagen de usuario" className="w-full h-full object-contain" />
+                </div>
+
+                {/* Información con separación ajustable */}
+                <div className="stat-info flex flex-col gap-0.5 sm:gap-1">
+                    <span className="stat-label text-gray-500 text-xs sm:text-sm font-medium uppercase tracking-wider">
+                        Usuarios
+                    </span>
+                    <span className="stat-value text-xl sm:text-2xl font-bold text-slate-800">
+                        {data.usuarios}
+                    </span>
                     </div>
                 </div>
 
                 {/* Laboratorio */}
-                <div className="stat-card border blue w-40 h-40">
-                    <div className="stat-icon">💻</div>
-                    <div className="stat-info">
-                        <span className="stat-label">Laboratorio</span>
-                        <span className="stat-value">{data.itemsLaboratorio}</span>
+                <div className="stat-card w-full sm:w-48 h-auto py-6 rounded-2xl border flex flex-col items-center justify-center text-center shadow-sm bg-white">
+                    <div className="stat-icon w-12 h-12 sm:w-16 sm:h-16 flex items-center justify-center mb-3 sm:mb-4">
+                        <img src={PC_dash} alt="imagen de pc" className="w-full h-full object-contain" />
+                    </div>
+                    <div className="stat-info flex flex-col gap-0.5 sm:gap-1">
+                        <span className="stat-label text-gray-500 text-xs sm:text-sm font-medium uppercase">Laboratorio</span>
+                        <span className="stat-value text-xl sm:text-2xl font-bold text-slate-800">{data.itemsLaboratorio}</span>
                     </div>
                 </div>
 
                 {/* Libros */}
-                <div className="stat-card green w-40 h-40 border">
-                    <div className="stat-icon">📚</div>
-                    <div className="stat-info">
-                        <span className="stat-label">Libros</span>
-                        <span className="stat-value">{data.totalLibros}</span>
+                <div className="stat-card w-full sm:w-48 h-auto py-6 rounded-2xl border flex flex-col items-center justify-center text-center shadow-sm bg-white">
+                    <div className="stat-icon w-12 h-12 sm:w-16 sm:h-16 flex items-center justify-center mb-3 sm:mb-4">
+                        <img src={Libros_dash} alt="imagen de libros" className="w-full h-full object-contain" />
+                    </div>
+                    <div className="stat-info flex flex-col gap-0.5 sm:gap-1">
+                        <span className="stat-label text-gray-500 text-xs sm:text-sm font-medium uppercase">Libros</span>
+                        <span className="stat-value text-xl sm:text-2xl font-bold text-slate-800">{data.totalLibros}</span>
                     </div>
                 </div>
 
                 {/* Deportes */}
-                <div className="stat-card orange w-40 h-40 border">
-                    <div className="stat-icon">⚽</div>
-                    <div className="stat-info">
-                        <span className="stat-label">Deportes</span>
-                        <span className="stat-value">{data.itemsDeportes}</span>
+                <div className="stat-card w-full sm:w-48 h-auto py-6 rounded-2xl border flex flex-col items-center justify-center text-center shadow-sm bg-white">
+                    <div className="stat-icon w-12 h-12 sm:w-16 sm:h-16 flex items-center justify-center mb-3 sm:mb-4">
+                        <img src={Deporte_dash} alt="imagen de deportes" className="w-full h-full object-contain" />
+                    </div>
+                    <div className="stat-info flex flex-col gap-0.5 sm:gap-1">
+                        <span className="stat-label text-gray-500 text-xs sm:text-sm font-medium uppercase">Deportes</span>
+                        <span className="stat-value text-xl sm:text-2xl font-bold text-slate-800">{data.itemsDeportes}</span>
                     </div>
                 </div>
-            </section>
-
+                </section>
             {/* Banner de Total Global */}
             <div className="bg-indigo-600 text-white p-6 rounded-xl shadow-lg flex justify-between items-center mt-6">
                 <div>

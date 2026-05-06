@@ -15,32 +15,32 @@ router.get('/', async (req, res) => {
 // 2. Funcion para poder ingresar los equipos que se utiizaran en el laboratorio
 router.post('/', async (req, res) => {
     try {
+        console.log("📩 BODY RECIBIDO:", req.body);
         // Desestructuramos según tu esquema
         const { 
             id_pc, 
             nombre_pc, 
-            Numero_laboratorio, 
+            numero_laboratorio, 
             profesor_cargo, 
             estado, 
-            especificaciones, // { procesador, ram, almacenamiento, serie }
-            mantenimiento    // { fecha, tipo, tecnico }
+            especificaciones // { Procesador, Ram, Almacenamiento, Tarjeta Grafica }
         } = req.body;
 
         const nuevaPC = new Laboratorio({
             id_pc,
             nombre_pc,
-            Numero_laboratorio,
+            numero_laboratorio,
             profesor_cargo,
             estado,
-            especificaciones,
-            mantenimiento
+            especificaciones
         });
 
         await nuevaPC.save();
         res.status(201).json(nuevaPC);
     } catch (error) {
+        console.log("❌ ERROR POST:", error);
         // Error 11000 es para campos duplicados (id_pc o nombre_pc)
-        if (error.code === 11000) {
+        if (error.code === 11000) { 
             return res.status(400).json({ mensaje: 'El ID o el Nombre de la PC ya existen' });
         }
         res.status(400).json({ mensaje: 'Error al crear', detalle: error.message });
@@ -66,6 +66,7 @@ router.put('/:id_pc', async (req, res) => {
 
         res.json(pcActualizada);
     } catch (error) {
+        console.log("❌ ERROR POST:", error);
         res.status(400).json({ mensaje: 'Error al actualizar', detalle: error.message });
     }
 });

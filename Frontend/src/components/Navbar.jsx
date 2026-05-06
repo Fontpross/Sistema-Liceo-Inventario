@@ -41,8 +41,8 @@ const Navbar = () => {
   return (
     <nav className="bg-white border-b border-slate-200 px-6 py-3 flex justify-between items-center shadow-sm relative z-50">
       <div className="flex items-center">
-        <h1 className="text-xl font-bold text-indigo-600 tracking-tight">
-          SISTEMA <span className="text-slate-800">LICEO</span>
+        <h1 className="text-xl font-bold text-yellow-400 tracking-tight">
+          Liceo <span className="text-black"> Bicentenario Comercial </span>
         </h1>
       </div>
 

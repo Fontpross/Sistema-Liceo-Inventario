@@ -36,7 +36,7 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/laboratorio" element={<Laboratorio />} />
           <Route path="/deportes" element={<Deportes />} />
-          <Route path="/bibliteca" index element={<Biblioteca />} />
+          <Route path="/biblioteca" element={<Biblioteca />} />
         </Route>
 
         {/* 6. Comodín: Si escriben cualquier otra cosa en la URL, los manda al Login */}

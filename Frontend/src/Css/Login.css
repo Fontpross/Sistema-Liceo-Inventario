@@ -3,7 +3,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  /*background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);*/
+  background: linear-gradient(135deg, #f3904f, #3b4371 100%);
   font-family: 'Inter', sans-serif;
 }
 
@@ -72,7 +73,7 @@
 
 .submit-button {
   width: 100%;
-  background: #4f46e5;
+  background: #2c3e50;
   color: white;
   padding: 0.75rem;
   border-radius: 0.75rem;
@@ -84,7 +85,7 @@
   justify-content: center;
 }
 
-.submit-button:hover { background: #4338ca; }
+.submit-button:hover { background: blue; }
 
 .spinner { animation: spin 1s linear infinite; }
 
