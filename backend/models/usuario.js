@@ -8,6 +8,10 @@ const UsuarioSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    rut: {
+        type: String,
+        required: true,
+    },
     email: {
         type: String,
         required: true,
@@ -19,7 +23,7 @@ const UsuarioSchema = new mongoose.Schema({
     },
     rol: {
         type: String,
-        enum: ['admin', 'profesor',],
+        enum: ['admin', 'profesor_lab', 'encargado_biblio', 'encargado_deportes', 'profesor'],
         default: 'profesor',
     },
 },);

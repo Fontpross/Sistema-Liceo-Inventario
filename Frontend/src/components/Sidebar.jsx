@@ -5,10 +5,15 @@ import { LayoutDashboard, Beaker, Book, Trophy } from 'lucide-react';
 const Sidebar = () => {
     const links = [
         { name: 'Inicio', path: '/dashboard', icon: <LayoutDashboard size={20} /> },
-        { name: 'Laboratorio', path: '/laboratorio', icon: <Beaker size={20} /> },
-        { name: 'Deportes', path: '/deportes', icon: <Trophy size={20} /> },
-        { name: 'Biblioteca', path: '/biblioteca', icon: <Book size={20} /> },
+        { name: 'ADM Computadores', path: '/laboratorio', icon: <Beaker size={20} /> },
+        { name: 'ADM Deportes', path: '/deportes', icon: <Trophy size={20} /> },
+        { name: 'ADM Biblioteca', path: '/biblioteca', icon: <Book size={20} /> },
+        
     ];
+
+    const subLinks = [
+        { name: 'Gestion Laboratorios', path: '/gestionLaboratorio', icon: <Beaker size={20} /> }
+    ]
 
     return (
         /* Cambiamos w-64 por w-20 (móvil) y sm:w-64 (escritorio) */
@@ -43,6 +48,28 @@ const Sidebar = () => {
                         {/* El nombre se oculta en móvil y aparece en sm (640px en adelante) */}
                         <span className="hidden sm:block font-medium truncate">
                             {link.name}
+                        </span>
+                    </NavLink>
+                ))}
+                <br />
+                {subLinks.map((subLinks) => (
+                    <NavLink
+                        key={subLinks.path}
+                        to={subLinks.path}
+                        className={({ isActive }) =>
+                            `flex items-center justify-center sm:justify-start gap-4 p-3 rounded-lg transition-all duration-200 ${
+                                isActive 
+                                ? 'bg-indigo-600 text-white shadow-lg' 
+                                : 'text-slate-400 hover:bg-slate-800 hover:text-white'
+                            }`
+                        }
+                    >
+                        {/* El icono siempre se ve, pero ajustamos el tamaño si es necesario */}
+                        <span className="flex-shrink-0">{subLinks.icon}</span>
+                        
+                        {/* El nombre se oculta en móvil y aparece en sm (640px en adelante) */}
+                        <span className="hidden sm:block font-medium truncate">
+                            {subLinks.name}
                         </span>
                     </NavLink>
                 ))}

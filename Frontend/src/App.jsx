@@ -8,6 +8,7 @@ import Dashboard from './views/Dashboard';
 import Laboratorio from './views/Laboratorio'
 import Biblioteca from './views/Biblioteca'
 import Deportes from './views/Deportes'
+import GestionLab from './views/GestionLaboratorios';
 
 
 // Importamos los estilos globales
@@ -37,6 +38,7 @@ function App() {
           <Route path="/laboratorio" element={<Laboratorio />} />
           <Route path="/deportes" element={<Deportes />} />
           <Route path="/biblioteca" element={<Biblioteca />} />
+          <Route path="/gestionLaboratorio" element={< GestionLab />} />
         </Route>
 
         {/* 6. Comodín: Si escriben cualquier otra cosa en la URL, los manda al Login */}

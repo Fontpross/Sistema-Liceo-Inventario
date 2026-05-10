@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const Laboratorio = require('../models/Laboratorio'); // Aquí SÍ importas el modelo
+const Usuario = require('../models/Usuario');
+const NumLaboratorio = require('../models/Nlab')
 
 // Ejemplo: Obtener todos los elementos del laboratorio
 router.get('/', async (req, res) => {
@@ -85,6 +87,25 @@ router.delete('/:id_pc', async (req, res) => {
         res.json({ mensaje: 'PC eliminada correctamente del inventario' });
     } catch (error) {
         res.status(500).json({ mensaje: 'Error al eliminar el equipo' });
+    }
+});
+
+// Get de los modulos externos como profesores y los laboratorios
+router.get('/profesores', async (req, res) => {
+    try {
+        const profesores = await Usuario.find({rol: 'profesor_lab'}).select('nombre');
+        res.json(profesores);
+    } catch (error) {
+        res.status(500).send('Error en el servidor');
+    }
+});
+
+router.get('/numLabs', async (req, res) => {
+    try {
+        const lab = await NumLaboratorio.find({estado: 'Activo'}).select('nombre');
+        res.json(lab);
+    } catch (error) {
+        res.status(500).send('Error en el servidor');
     }
 });
 

@@ -16,6 +16,8 @@ app.use(express.json());
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/dashboard', require('./routes/dashboard'));
 app.use('/api/laboratorio', require('./routes/laboratorio'));
+app.use('/api/laboratorios', require('./routes/numero_lab'));
+
 
 
 const PORT = process.env.PORT || 5000;

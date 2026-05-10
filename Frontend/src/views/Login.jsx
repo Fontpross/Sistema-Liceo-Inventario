@@ -29,8 +29,8 @@ const Login = () => {
                 title: '¡Inicio de Sesión Exitoso!',
                 text: `Hola ${respuesta.data.usuario.nombre}, el sistema está listo.`,
                 icon: 'success',
-                confirmButtonColor: '#4f46e5', // El color morado de tu diseño
-                timer: 2000, // Se cierra sola en 2 segundos
+                confirmButtonColor: '#4f46e5',
+                timer: 2000, 
                 timerProgressBar: true
             });
             

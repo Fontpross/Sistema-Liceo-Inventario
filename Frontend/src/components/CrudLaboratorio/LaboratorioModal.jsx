@@ -4,6 +4,8 @@ import { ApiRestLab } from '../../Config/api'; // Importamos tu URL base
 
 const LaboratorioModal = ({ isOpen, onClose, onSave, equipoEditar }) => {
   // Estado inicial del formulario siguiendo tu esquema de MongoDB
+  const [profesores, setProfesores] = useState([]);
+  const [labs, setLabs] = useState([]);
   const [formData, setFormData] = useState({
     id_pc: '',
     nombre_pc: '',
@@ -17,6 +19,44 @@ const LaboratorioModal = ({ isOpen, onClose, onSave, equipoEditar }) => {
       tarjetaGrafica: ''
     }
   });
+
+  // Efecto que nos ayuda a traer los profesores disponibles a cargo de los laboratorios
+  useEffect(() => {
+    const cargarProfesores = async () => {
+        try {
+            const response = await fetch(`${ApiRestLab}/profesores`, {
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+            });
+            const data = await response.json();
+            setProfesores(data);
+        } catch (error) {
+            console.error("Error cargando los nombres de los profesores:", error);
+        }
+    };
+
+    if (isOpen) {
+      cargarProfesores();
+    }
+  }, [isOpen]);
+
+  // Efecto que nos ayuda a traer los laboratorios disponibles
+  useEffect(() => {
+    const cargarLabs = async () => {
+        try {
+            const response = await fetch(`${ApiRestLab}/numLabs`, {
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+            });
+            const data = await response.json();
+            setLabs(data);
+        } catch (error) {
+            console.error("Error cargando los nombres de los laboratorios:", error);
+        }
+    };
+
+    if (isOpen) {
+      cargarLabs();
+    }
+  }, [isOpen]);
 
   // Efecto para cargar datos si vamos a EDITAR o limpiar si es NUEVO
   useEffect(() => {
@@ -66,52 +106,52 @@ const LaboratorioModal = ({ isOpen, onClose, onSave, equipoEditar }) => {
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  const url = equipoEditar ? `${ApiRestLab}/${encodeURIComponent(formData.id_pc)}` : ApiRestLab;
-  const method = equipoEditar ? 'PUT' : 'POST';
+    const url = equipoEditar ? `${ApiRestLab}/${encodeURIComponent(formData.id_pc)}` : ApiRestLab;
+    const method = equipoEditar ? 'PUT' : 'POST';
 
-  try {
-    const dataToSend = {
-      id_pc: formData.id_pc,
-      nombre_pc: formData.nombre_pc,
-      numero_laboratorio: formData.numero_laboratorio,
-      profesor_cargo: formData.profesor_cargo,
-      estado: formData.estado,
-      especificaciones: {
-        procesador: formData.especificaciones.procesador,
-        ram: formData.especificaciones.ram,
-        almacenamiento: formData.especificaciones.almacenamiento,
-        tarjetaGrafica: formData.especificaciones.tarjetaGrafica
+    try {
+      const dataToSend = {
+        id_pc: formData.id_pc,
+        nombre_pc: formData.nombre_pc,
+        numero_laboratorio: formData.numero_laboratorio,
+        profesor_cargo: formData.profesor_cargo,
+        estado: formData.estado,
+        especificaciones: {
+          procesador: formData.especificaciones.procesador,
+          ram: formData.especificaciones.ram,
+          almacenamiento: formData.especificaciones.almacenamiento,
+          tarjetaGrafica: formData.especificaciones.tarjetaGrafica
+        }
+      };
+
+      console.log("📤 ENVIANDO:", dataToSend);
+
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify(dataToSend)
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        onSave();
+        onClose();
+      } else {
+        console.error("❌ ERROR BACKEND:", data);
+        alert(JSON.stringify(data, null, 2));
       }
-    };
 
-    console.log("📤 ENVIANDO:", dataToSend);
-
-    const response = await fetch(url, {
-      method,
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
-      },
-      body: JSON.stringify(dataToSend)
-    });
-
-    const data = await response.json();
-
-    if (response.ok) {
-      onSave();
-      onClose();
-    } else {
-      console.error("❌ ERROR BACKEND:", data);
-      alert(JSON.stringify(data, null, 2));
+    } catch (error) {
+      console.error("Error en la petición:", error);
+      alert("Error de conexión con el servidor puerto 5000");
     }
-
-  } catch (error) {
-    console.error("Error en la petición:", error);
-    alert("Error de conexión con el servidor puerto 5000");
-  }
-};
+  };
 
   if (!isOpen) return null;
 
@@ -162,31 +202,39 @@ const LaboratorioModal = ({ isOpen, onClose, onSave, equipoEditar }) => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Laboratorio</label>
-              <select
+                <select
                 name="numero_laboratorio"
                 value={formData.numero_laboratorio}
                 onChange={handleChange}
-                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 outline-none transition-all ${
-                formData.numero_laboratorio === 'Laboratorio 1' ? 'border-emerald-200 bg-emerald-50 text-emerald-700 focus:ring-emerald-500' :
-                formData.numero_laboratorio === 'Laboratorio 2' ? 'border-emerald-200 bg-emerald-50 text-emerald-300 focus:ring-emerald-500' :
-                formData.numero_laboratorio === 'Laboratorio 3' ? 'border-emerald-200 bg-emerald-50 text-emerald-300 focus:ring-emerald-500' :
-                ''}`}
+                className="w-full px-3 py-2 border rounded-lg focus:ring-2 outline-none transition-all"
+                required
               >
-                <option value="">Seleccione laboratorio</option>
-                <option value="Laboratorio 1">Laboratorio 1</option>
-                <option value="Laboratorio 2">Laboratorio 2</option>
-                <option value="Laboratorio 3">Laboratorio 3</option>
+                <option value="" disabled>Seleccionar Laboratorio</option>
+                {labs.map((lab) => (
+                  <option key={lab._id} value={lab.nombre}>
+                    {lab.nombre}
+                  </option>
+                ))}
               </select>
             </div>
             <div>
-              <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Profesor</label>
-              <input
+              <label className="block text-xs font-bold text-slate-500 uppercase mb-1">
+                Profesor a cargo
+              </label>
+              <select
                 name="profesor_cargo"
                 value={formData.profesor_cargo}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
                 required
-              />
+              >
+                <option value="" disabled>Seleccionar profesor</option>
+                {profesores.map((profe) => (
+                  <option key={profe._id} value={profe.nombre}>
+                    {profe.nombre}
+                  </option>
+                ))}
+              </select>
             </div>
             <div>
               <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Estado del equipo</label>
