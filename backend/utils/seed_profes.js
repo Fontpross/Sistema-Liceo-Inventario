@@ -8,10 +8,10 @@ const crearProfesor = async () => {
     await mongoose.connect(process.env.MONGO_URI);
 
     const Profesor_lab = new Usuario({
-        nombre: 'Profesor Torres',
-        rut: '00000000-0',
-        email: 'torres@liceo.com',
-        password: 'torres123',
+        nombre: 'Profesor Caceres',
+        rut: '22222222-2',
+        email: 'Caceres@liceo.com',
+        password: 'caceres123',
         rol: 'profesor_lab'
     });
 

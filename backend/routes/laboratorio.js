@@ -8,7 +8,13 @@ const NumLaboratorio = require('../models/Nlab')
 router.get('/', async (req, res) => {
     try {
         const items = await Laboratorio.find();
+            
+        
+        
+        
+        
         res.json(items);
+        
     } catch (error) {
         res.status(500).send('Error en el servidor');
     }

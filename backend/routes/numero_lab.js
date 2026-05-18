@@ -18,6 +18,12 @@ router.get('/', async (req, res) => {
 router.post('/', async (req, res) => {
     try {
         const { nombre, estado } = req.body;
+
+        // VALIDACIÓN: Si no llega el nombre, el servidor podría fallar
+        if (!nombre) {
+            return res.status(400).json({ mensaje: "El nombre es obligatorio" });
+        }
+
         const nuevoLab = new NumLaboratorio({ nombre, estado });
         await nuevoLab.save();
         res.status(201).json(nuevoLab);

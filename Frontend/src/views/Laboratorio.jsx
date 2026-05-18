@@ -57,7 +57,8 @@ const Laboratorio = () => {
   // 3. Filtrar equipos por SKU o Nombre
   const equiposFiltrados = equipos.filter(eq => 
     eq.id_pc.toLowerCase().includes(filtro.toLowerCase()) ||
-    eq.nombre_pc.toLowerCase().includes(filtro.toLowerCase())
+    eq.nombre_pc.toLowerCase().includes(filtro.toLowerCase()) ||
+    eq.numero_laboratorio.toLowerCase().includes(filtro.toLowerCase())
   );
 
   return (

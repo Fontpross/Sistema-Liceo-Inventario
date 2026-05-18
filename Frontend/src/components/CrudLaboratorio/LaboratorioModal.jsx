@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Save, Cpu, Database, HardDrive, Monitor } from 'lucide-react';
 import { ApiRestLab } from '../../Config/api'; // Importamos tu URL base
+import Swal from 'sweetalert2';
 
 const LaboratorioModal = ({ isOpen, onClose, onSave, equipoEditar }) => {
   // Estado inicial del formulario siguiendo tu esquema de MongoDB
@@ -94,8 +95,30 @@ const LaboratorioModal = ({ isOpen, onClose, onSave, equipoEditar }) => {
   // Manejador de cambios para campos normales y anidados (especificaciones)
   const handleChange = (e) => {
     const { name, value } = e.target;
+
+    // 1. Definimos la regla para SKU / Nombre de PC
+    // Esta RegEx permite: letras (A-Z, a-z), números (0-9), guion (-), guion bajo (_), punto (.) y coma (,)
+    // ^[a-zA-Z0-9.\-_,]*$
+    const regexPermitido = /^[a-zA-Z0-9\_]*$/;
+
+    if (name === 'id_pc' || name === 'nombre_pc') {
+      // Si el usuario intenta ingresar un carácter no permitido, no actualizamos el estado
+      if (!regexPermitido.test(value)) {
+        return; 
+      }
+    }
+
+    
     if (name.includes('.')) {
       const [parent, child] = name.split('.');
+
+      // RegEx para hardware: letras, números, espacios, puntos, comas, guiones y barras (/)
+      const regexHardware = /^[a-zA-Z0-9 .\-_,/]*$/;
+
+      if (parent === 'especificaciones' && !regexHardware.test(value)) {
+        return; // Bloquea si intentan meter caracteres como @, $, %, &, etc.
+      }
+      
       setFormData(prev => ({
         ...prev,
         [parent]: { ...prev[parent], [child]: value }
@@ -107,6 +130,20 @@ const LaboratorioModal = ({ isOpen, onClose, onSave, equipoEditar }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Expresión regular para validar el formato final (no permite espacios ni caracteres raros)
+    const regexValidacion = /^[a-zA-Z0-9\_]+$/;
+
+    if (!regexValidacion.test(formData.id_pc) || !regexValidacion.test(formData.nombre_pc)) {
+      Swal.fire({
+        title: 'Formato inválido',
+        text: 'El SKU (ID PC) y el Nombre solo pueden contener letras, números, puntos (.), comas (,), guiones (-) y guiones bajos (_). Sin espacios ni símbolos como & o %.',
+        icon: 'warning',
+        confirmButtonColor: '#4f46e5'
+      });
+      return; // Detiene el envío del formulario
+    }
+
 
     const url = equipoEditar ? `${ApiRestLab}/${encodeURIComponent(formData.id_pc)}` : ApiRestLab;
     const method = equipoEditar ? 'PUT' : 'POST';
@@ -126,6 +163,7 @@ const LaboratorioModal = ({ isOpen, onClose, onSave, equipoEditar }) => {
         }
       };
 
+
       console.log("📤 ENVIANDO:", dataToSend);
 
       const response = await fetch(url, {
@@ -140,16 +178,38 @@ const LaboratorioModal = ({ isOpen, onClose, onSave, equipoEditar }) => {
       const data = await response.json();
 
       if (response.ok) {
+        await Swal.fire({
+          title: method === 'POST' ? '¡Ingreso Exitoso!' : '¡Edición Exitosa!',
+          text: method === 'POST' ? 'El equipo ha sido ingresado correctamente.' : 'El equipo ha sido actualizado correctamente.',
+          icon: 'success',
+          confirmButtonColor: '#4f46e5',
+          timer: 2000, 
+          timerProgressBar: true
+        });
         onSave();
         onClose();
+        
+
       } else {
+        // CORRECCIÓN: Usamos 'data' que es la respuesta JSON del servidor
+        Swal.fire({
+          title: 'Error en el servidor',
+          text: data.msg || data.message || 'No se pudo procesar la solicitud o el id del equipo o nombre estan repetidos',
+          icon: 'error',
+          confirmButtonColor: '#d33'
+        });
         console.error("❌ ERROR BACKEND:", data);
-        alert(JSON.stringify(data, null, 2));
       }
 
     } catch (error) {
-      console.error("Error en la petición:", error);
-      alert("Error de conexión con el servidor puerto 5000");
+      // Este catch captura errores de red (ej. sin internet, server apagado)
+      Swal.fire({
+          title: 'Error de Conexión',
+          text: 'No se pudo establecer comunicación con el servidor.',
+          icon: 'error',
+          confirmButtonColor: '#d33'
+      });
+      console.error("❌ ERROR RED:", error);
     }
   };
 
@@ -192,6 +252,7 @@ const LaboratorioModal = ({ isOpen, onClose, onSave, equipoEditar }) => {
                 name="nombre_pc"
                 value={formData.nombre_pc}
                 onChange={handleChange}
+                disabled={!!equipoEditar} // Deshabilitado si estamos editando
                 className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
                 required
               />

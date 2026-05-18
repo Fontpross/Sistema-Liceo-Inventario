@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Beaker, Plus, Trash2, Edit3, Save, X, AlertCircle, CheckCircle, Users } from 'lucide-react';
+import { Beaker, Plus, Trash2, Edit3, Save, AlertCircle, CheckCircle } from 'lucide-react';
 import { ApiRestSubLab } from '../Config/api';
+// 1. Importar SweetAlert2
+import Swal from 'sweetalert2';
 
 const GestionLab = () => {
     const [laboratorios, setLaboratorios] = useState([]);
@@ -27,8 +29,34 @@ const GestionLab = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const url = editando ? `${ApiRestSubLab}/${encodeURIComponent(editando.nombre)}` : ApiRestSubLab;
+
+        const nombreFormateado = formData.nombre.trim();
+
+        // 2. VALIDACIÓN DE NOMBRE REPETIDO
+        if (!editando) {
+            const existe = laboratorios.some(
+                (lab) => lab.nombre.toLowerCase() === nombreFormateado.toLowerCase()
+            );
+
+            if (existe) {
+                Swal.fire({
+                    title: '¡Nombre duplicado!',
+                    text: `El laboratorio "${nombreFormateado}" ya se encuentra registrado.`,
+                    icon: 'warning',
+                    confirmButtonColor: '#4f46e5',
+                    confirmButtonText: 'Entendido'
+                });
+                return; 
+            }
+        }
+
+        const baseUrl = ApiRestSubLab.endsWith('/') ? ApiRestSubLab.slice(0, -1) : ApiRestSubLab;
+        const url = editando ? `${baseUrl}/${encodeURIComponent(editando.nombre)}` : baseUrl;
         const method = editando ? 'PUT' : 'POST';
+        
+        const cuerpoPeticion = editando 
+        ? { nuevoNombre: nombreFormateado, estado: formData.estado } 
+        : { nombre: nombreFormateado, estado: formData.estado };
 
         try {
             const res = await fetch(url, {
@@ -37,14 +65,26 @@ const GestionLab = () => {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${localStorage.getItem('token')}`
                 },
-                body: JSON.stringify(formData)
+                body: JSON.stringify(cuerpoPeticion)
             });
 
             if (res.ok) {
                 setFormData({ nombre: '', estado: 'Activo' });
                 setEditando(null);
                 obtenerLaboratorios();
-                mostrarMensaje(editando ? "Laboratorio actualizado" : "Laboratorio creado", "success");
+                
+                
+                Swal.fire({
+                    title: '¡Éxito!',
+                    text: editando ? "Laboratorio actualizado correctamente" : "Laboratorio creado correctamente",
+                    icon: 'success',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            } else {
+                
+                const errorData = await res.json();
+                mostrarMensaje(errorData.mensaje || "Error en la operación", "error");
             }
         } catch (error) { mostrarMensaje("Error en la operación", "error"); }
     };
@@ -55,18 +95,33 @@ const GestionLab = () => {
         window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
     };
 
+    // Eliminación usando SweetAlert2
     const handleEliminar = async (nombre) => {
-        if (!window.confirm(`¿Eliminar ${nombre}?`)) return;
-        try {
-            const res = await fetch(`${ApiRestSubLab}/${encodeURIComponent(nombre)}`, {
-                method: 'DELETE',
-                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-            });
-            if (res.ok) {
-                obtenerLaboratorios();
-                mostrarMensaje("Eliminado correctamente", "success");
+        Swal.fire({
+            title: `¿Eliminar ${nombre}?`,
+            text: "Esta acción no se puede deshacer.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444', 
+            cancelButtonColor: '#64748b',  
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    const res = await fetch(`${ApiRestSubLab}/${encodeURIComponent(nombre)}`, {
+                        method: 'DELETE',
+                        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                    });
+                    if (res.ok) {
+                        obtenerLaboratorios();
+                        Swal.fire('¡Eliminado!', 'El laboratorio ha sido borrado.', 'success');
+                    }
+                } catch (error) { 
+                    Swal.fire('Error', 'No se pudo eliminar el laboratorio.', 'error');
+                }
             }
-        } catch (error) { mostrarMensaje("Error al eliminar", "error"); }
+        });
     };
 
     const mostrarMensaje = (texto, tipo) => {
@@ -85,7 +140,7 @@ const GestionLab = () => {
                 </div>
             </header>
 
-            {/* ALERTAS */}
+            {/* ALERTAS LOCALES (Mantienen su funcionalidad para errores rápidos de conexión) */}
             {mensaje.texto && (
                 <div className={`p-4 rounded-xl flex items-center gap-3 ${
                     mensaje.tipo === 'success' ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'
@@ -95,7 +150,7 @@ const GestionLab = () => {
                 </div>
             )}
 
-            {/* TABLA ARRIBA */}
+            {/* TABLA */}
             <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left">
@@ -126,18 +181,17 @@ const GestionLab = () => {
                 </div>
             </div>
 
-            {/* FORMULARIO ABAJO */}
+            {/* FORMULARIO */}
             <div className="bg-white p-5 sm:p-8 rounded-2xl shadow-md border-t-4 border-indigo-600">
                 <h2 className="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
-                    {editando ? <Edit3 size={20} className="text-amber-500"/> : <Plus size={20} className="text-indigo-600"/>}
+                    {editando ? <Edit3 size={20} className="text-amber-500"/> : <Plus size={20} className="text-indigo-600 " />}
                     {editando ? `Editando: ${editando.nombre}` : 'Añadir Nuevo Espacio'}
                 </h2>
                 
-                {/* Cambiado a grid-cols-1 sm:grid-cols-2 */}
                 <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <div className="space-y-1">
                         <label className="text-xs font-black text-slate-500 uppercase">Nombre</label>
-                        <input name="nombre" value={formData.nombre} onChange={handleInputChange} placeholder="Ej: Laboratorio 1" className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all" required />
+                        <input name="nombre" value={formData.nombre} onChange={handleInputChange} disabled={!!editando} placeholder="Ej: Laboratorio 1" className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all" required />
                     </div>
 
                     <div className="space-y-1">
