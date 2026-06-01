@@ -6,7 +6,7 @@ const LabSchema = new mongoose.Schema({
     numero_laboratorio: { type: String, required: true },
     profesor_cargo: { type: String, required: true },
     estado: { type: String, enum: ['Activo', 'En Reparación', 'Dañado', 'Inactivo'], default: 'Activo' },
-    especificaciones: { procesador: String, ram: String, almacenamiento: String, tarjetaGrafica: String},
+    especificaciones: { procesador: String, ram: String, almacenamiento: String, tarjeta_grafica: String},
     
 });
 

@@ -6,13 +6,13 @@ const Sidebar = () => {
     const links = [
         { name: 'Inicio', path: '/dashboard', icon: <LayoutDashboard size={20} /> },
         { name: 'ADM Computadores', path: '/laboratorio', icon: <Beaker size={20} /> },
-        { name: 'ADM Deportes', path: '/deportes', icon: <Trophy size={20} /> },
-        { name: 'ADM Biblioteca', path: '/biblioteca', icon: <Book size={20} /> },
+        { name: 'ADM Reportes', path: '/reportes', icon: <Trophy size={20} /> },
         
     ];
 
     const subLinks = [
-        { name: 'Gestion Laboratorios', path: '/gestionLaboratorio', icon: <Beaker size={20} /> }
+        { name: 'Gestion Laboratorios', path: '/gestionLaboratorio', icon: <Beaker size={20} /> },
+        { name: 'Gestion Mantenimientos', path: '/gestionMantenimientos', icon: <Beaker size={20} /> },
     ]
 
     return (

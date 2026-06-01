@@ -1,39 +1,35 @@
 const express = require('express'); 
 const router = express.Router();   
-const NumLaboratorio = require('../models/Nlab'); 
-const Equipo = require('../models/Laboratorio'); 
+const Mantenimientos = require('../models/Mantenimientos');
+const Reportes = require('../models/Reportes');
 
-// 1. Obtener los laboratorios
+// 1. Obtener los mantenimientos
 router.get('/', async (req, res) => {
     try {
-        const lab = await NumLaboratorio.find();
-        res.json(lab);
+        const MTN = await Mantenimientos.find();
+        res.json(MTN);
     } catch (error) {
         res.status(500).send('Error en el servidor');
     }
 });
 
-// 2. Crear un nuevo laboratorio
+
 router.post('/', async (req, res) => {
     try {
-        const { nombre, estado } = req.body;
+        const { nombre_mantenimiento, estado_mantenimiento } = req.body;
 
-        // VALIDACIÓNES
-        if (!nombre) {
+        if (!nombre_mantenimiento) {
             return res.status(400).json({ mensaje: "El nombre es obligatorio" });
         }
-        
-        if (!estado) {
+
+        if (!estado_mantenimiento) {
             return res.status(400).json({ mensaje: "El estado es obligatorio" });
         }
 
-        if (!['Activo', 'Inactivo'].includes(estado)) {
-            return res.status(400).json({ mensaje: "Un laboratorio nuevo solo puede registrarse como Activo o Inactivo" });
-        }
+        const nuevoMTN = new Mantenimientos({ nombre_mantenimiento, estado_mantenimiento });
+        await nuevoMTN.save();
+        res.status(201).json(nuevoMTN);
 
-        const nuevoLab = new NumLaboratorio({ nombre, estado });
-        await nuevoLab.save();
-        res.status(201).json(nuevoLab);
     } catch (error) {
         if (error.code === 11000) return res.status(400).json({ mensaje: "Ese nombre ya existe" });
         res.status(500).json({ mensaje: "Error al crear" });
@@ -46,28 +42,28 @@ router.put('/:nombreActual', async (req, res) => {
         const { nombreActual } = req.params;
         const { nuevoNombre, estado } = req.body;
 
-        const labActualizado = await NumLaboratorio.findOneAndUpdate(
-            { nombre: nombreActual },
-            { nombre: nuevoNombre, estado: estado },
+        const MantenimientoActualizado = await Mantenimientos.findOneAndUpdate(
+            { nombre_mantenimiento: nombreActual },
+            { nombre_mantenimiento: nuevoNombre, estado_mantenimiento: estado },
             { new: true }
         );
 
-        // Si no se encuentra el laboratorio a actualizar, se devuelve un error 404
-        if (!labActualizado) {
-            return res.status(404).json({ mensaje: "Laboratorio no encontrado" });
+
+        if (!MantenimientoActualizado) {
+            return res.status(404).json({ mensaje: "Mantenimiento no encontrado" });
         }
 
         // Actualizar las PCs vinculadas para que no pierdan la referencia
         if (nuevoNombre && nuevoNombre !== nombreActual) {
-            await Equipo.updateMany(
-                { numero_laboratorio: nombreActual },
-                { numero_laboratorio: nuevoNombre }
+            await Reportes.updateMany(
+                { nombre_mantenimiento: nombreActual },
+                { nombre_mantenimiento: nuevoNombre }
             );
         }
 
         res.json({ 
             mensaje: "Actualización exitosa",
-            data: labActualizado 
+            data: MantenimientoActualizado 
         });
     } catch (error) {
         if (error.code === 11000) {
@@ -82,16 +78,18 @@ router.put('/:nombreActual', async (req, res) => {
 router.delete('/:nombre', async (req, res) => {
     try {
         const { nombre } = req.params;
-        const labEliminado = await NumLaboratorio.findOneAndDelete({ nombre: nombre });
+        const MantenimientoEliminado = await Mantenimientos.findOneAndDelete({ nombre_mantenimiento: nombre });
 
-        if (!labEliminado) {
-            return res.status(404).json({ mensaje: "No se encontró el laboratorio" });
+        if (!MantenimientoEliminado) {
+            return res.status(404).json({ mensaje: "No se encontró el mantenimiento" });
         }
 
-        res.json({ mensaje: `Laboratorio '${nombre}' eliminado correctamente` });
+        res.json({ mensaje: `Mantenimiento '${nombre}' eliminado correctamente` });
     } catch (error) {
         res.status(500).json({ mensaje: "Error al eliminar" });
     }
 });
+
+
 
 module.exports = router;

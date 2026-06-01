@@ -2,25 +2,26 @@ const express = require('express');
 const router = express.Router();
 const Usuario = require('../models/Usuario');
 const Lab = require('../models/Laboratorio');
-const Libro = require('../models/Biblioteca');
-const Deporte = require('../models/Deportes');
+const mantenimientos = require('../models/Mantenimientos');
+const reportes = require('../models/Reportes');
 
 router.get('/resumen', async (req, res) => {
     try {
-        const [users, labs, books, sports] = await Promise.all([
+        const [users, labs, mts, report] = await Promise.all([
             Usuario.countDocuments(),
             Lab.countDocuments(),
-            Libro.countDocuments(),
-            Deporte.countDocuments()
+            mantenimientos.countDocuments(),
+            reportes.countDocuments()
         ]);
 
         res.json({
             usuarios: users,
             itemsLaboratorio: labs,
-            totalLibros: books,
-            itemsDeportes: sports,
-            totalGlobal: labs + books + sports
+            mantenimientos: mts,
+            reportes: report,
+            totalGlobal: labs + mts + report
         });
+
     } catch (error) {
         res.status(500).send("Error en el servidor");
     }

@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const Laboratorio = require('../models/Laboratorio'); // Aquí SÍ importas el modelo
+const Laboratorio = require('../models/Laboratorio');
 const Usuario = require('../models/Usuario');
 const NumLaboratorio = require('../models/Nlab')
 
@@ -8,11 +8,6 @@ const NumLaboratorio = require('../models/Nlab')
 router.get('/', async (req, res) => {
     try {
         const items = await Laboratorio.find();
-            
-        
-        
-        
-        
         res.json(items);
         
     } catch (error) {
@@ -33,6 +28,28 @@ router.post('/', async (req, res) => {
             estado, 
             especificaciones // { Procesador, Ram, Almacenamiento, Tarjeta Grafica }
         } = req.body;
+        
+        // Validaciones
+        if (!id_pc || !nombre_pc || !numero_laboratorio || !profesor_cargo || !estado || !especificaciones) {
+            return res.status(400).json({ mensaje: 'Todos los campos son obligatorios' });
+        }
+
+        if (!['Activo', 'Inactivo'].includes(estado)) {
+            return res.status(400).json({ mensaje: 'Un equipo nuevo solo puede registrarse como Activo o Inactivo' });
+        }
+
+        // Validación de las especificaciones técnicas
+        if (!especificaciones.procesador || !especificaciones.ram || !especificaciones.almacenamiento || !especificaciones.tarjeta_grafica) {
+            return res.status(400).json({ mensaje: 'Especificaciones incompletas' });
+        }
+
+        if(!especificaciones.ram.match(/^\d+\s?GB$/)) {
+            return res.status(400).json({ mensaje: 'La RAM debe tener un formato válido' });
+        }
+
+        if(!especificaciones.almacenamiento.match(/^\d+\s?(GB|TB)\s?SSD$/)) {
+            return res.status(400).json({ mensaje: 'El almacenamiento debe tener un formato válido' });
+        }
 
         const nuevaPC = new Laboratorio({
             id_pc,
@@ -61,9 +78,16 @@ router.put('/:id_pc', async (req, res) => {
         const { id_pc } = req.params; // Tomamos el ID del PC de la URL
         const datosActualizados = req.body;
 
+        if (datosActualizados.estado) {
+            const estadosPermitidos = ['Activo', 'Inactivo', 'Dañado', 'En Reparación'];
+            if (!estadosPermitidos.includes(datosActualizados.estado)) {
+                return res.status(400).json({ mensaje: 'El estado de actualización no es válido' });
+            }
+        }
+        
         // findOneAndUpdate busca por cualquier campo del esquema
         const pcActualizada = await Laboratorio.findOneAndUpdate(
-            { id_pc: id_pc }, // Criterio de búsqueda
+            { id_pc: id_pc }, // Criterio de búsqueda por el id del equipo
             datosActualizados, // Datos a cambiar
             { new: true, runValidators: true }
         );
@@ -73,13 +97,14 @@ router.put('/:id_pc', async (req, res) => {
         }
 
         res.json(pcActualizada);
+
     } catch (error) {
         console.log("❌ ERROR POST:", error);
         res.status(400).json({ mensaje: 'Error al actualizar', detalle: error.message });
     }
 });
 
-// 2. Eliminar el equipo por medio del id_pc
+// 4. Eliminar el equipo por medio del id_pc
 router.delete('/:id_pc', async (req, res) => {
     try {
         const { id_pc } = req.params;
@@ -95,6 +120,7 @@ router.delete('/:id_pc', async (req, res) => {
         res.status(500).json({ mensaje: 'Error al eliminar el equipo' });
     }
 });
+
 
 // Get de los modulos externos como profesores y los laboratorios
 router.get('/profesores', async (req, res) => {

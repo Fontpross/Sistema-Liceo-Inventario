@@ -7,9 +7,11 @@ import {
   Search, 
   MoreVertical,
   Cpu,
-  RefreshCw
+  RefreshCw,
+  FileText
 } from 'lucide-react';
-import LaboratorioModal from '../components/CrudLaboratorio/LaboratorioModal'; // El que creamos antes
+import LaboratorioModal from '../components/CrudLaboratorio/LaboratorioModal';
+import ReporteModal from '../components/CrudLaboratorio/ReportesModal';
 import { ApiRestLab } from '../Config/api';
 
 const Laboratorio = () => {
@@ -18,6 +20,8 @@ const Laboratorio = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [equipoSeleccionado, setEquipoSeleccionado] = useState(null);
   const [filtro, setFiltro] = useState("");
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+  const [equipoParaReporte, setEquipoParaReporte] = useState(null);
 
   // 1. Cargar datos desde el Backend
   const cargarEquipos = async () => {
@@ -140,10 +144,10 @@ const Laboratorio = () => {
                           {equipo.especificaciones?.ram || 'N/A'} RAM
                         </span>
                         <span className="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded border border-slate-200">
-                          {equipo.especificaciones?.almacenamiento || 'N/A'} RAM
+                          {equipo.especificaciones?.almacenamiento || 'N/A'} 
                         </span>
                         <span className="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded border border-slate-200">
-                          {equipo.especificaciones?.tarjetaGrafica || 'N/A'} RAM
+                          {equipo.especificaciones?.tarjeta_grafica || 'N/A'} 
                         </span>
                       </div>
                     </td>
@@ -158,12 +162,27 @@ const Laboratorio = () => {
                     </td>
                     <td className="p-4">
                       <div className="flex justify-center gap-2">
+
+                        {equipo.estado === 'Dañado' && (
+                        <button
+                          onClick={() => {
+                            setEquipoParaReporte(equipo); 
+                            setIsReportModalOpen(true);
+                          }}
+                          className="flex items-center gap-1 bg-rose-600 hover:bg-rose-700 text-white font-bold text-[11px] py-1 px-2.5 rounded-lg transition-all"
+                        >
+                          <FileText size={12} />
+                           Reporte
+                        </button>
+                        )}
+
                         <button 
                           onClick={() => { setEquipoSeleccionado(equipo); setIsModalOpen(true); }}
                           className="p-2 text-blue-500 hover:bg-blue-50 rounded-lg transition-colors"
                         >
                           <Pencil size={18} />
                         </button>
+
                         <button 
                           onClick={() => eliminarEquipo(equipo.id_pc)}
                           className="p-2 text-rose-500 hover:bg-rose-50 rounded-lg transition-colors"
@@ -192,6 +211,16 @@ const Laboratorio = () => {
         onClose={() => setIsModalOpen(false)} 
         equipoEditar={equipoSeleccionado}
         onSave={cargarEquipos} // Recarga la tabla después de guardar/actualizar
+      />
+
+      <ReporteModal 
+        isOpen={isReportModalOpen}
+        onClose={() => {
+          setIsReportModalOpen(false);
+          setEquipoParaReporte(null);
+        }}
+        equipo={equipoParaReporte}
+        onSave={cargarEquipos}
       />
     </div>
   );

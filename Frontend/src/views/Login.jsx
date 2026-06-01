@@ -3,6 +3,7 @@ import { data, useNavigate } from 'react-router-dom';
 import { Lock, Mail, Eye, EyeOff, Loader2 } from 'lucide-react';
 import Swal from 'sweetalert2';
 import axios from 'axios';
+import {ApiRestLogin} from '../Config/api'
 
 const Login = () => {
 
@@ -19,37 +20,39 @@ const Login = () => {
 
         try {
             // Consulta al servidor por medio del endpoint las credenciales
-            const respuesta = await axios.post('http://localhost:5000/api/auth/login', { email, password });
+            const respuesta = await axios.post(ApiRestLogin, { email, password });
   
             localStorage.setItem('token', respuesta.data.token);
             localStorage.setItem('name', respuesta.data.usuario.nombre);
 
-            // Alerta de inicio de sesion
-            await Swal.fire({
+            // Alerta de inicio de sesion (Cambiado para asegurar la redirección)
+            Swal.fire({
                 title: '¡Inicio de Sesión Exitoso!',
                 text: `Hola ${respuesta.data.usuario.nombre}, el sistema está listo.`,
                 icon: 'success',
                 confirmButtonColor: '#4f46e5',
                 timer: 2000, 
                 timerProgressBar: true
+            }).then(() => {
+                // Esto se ejecuta SÓLO cuando la alerta se cierra
+                navigate('/dashboard');
             });
-            
-            navigate('/dashboard');
 
         }   catch (error) {
-                setLoading(false)
-                // Si express-validator manda errores, vienen en la propiedad 'errores'
-                const listaErrores = error.response?.data?.errores;
-                const mensaje = listaErrores ? listaErrores[0].msg : (error.response?.data?.msg || 'Error');
-            
-            // Alerta de error por credenciales incorrectas 
-            Swal.fire({
-                title: 'Error',
-                text: error.response?.data?.msg || 'Credenciales incorrectas',
-                icon: 'error',
-                confirmButtonColor: '#d33'
-            });
+              setLoading(false);
+              // 1. Extraemos los errores si vienen de express-validator
+              const listaErrores = error.response?.data?.errores;
+              // 2. Si hay lista de errores usamos el primero, si no, el mensaje genérico del server
+              const mensajeError = listaErrores ? listaErrores[0].msg : (error.response?.data?.msg || 'Credenciales incorrectas');
+
+              Swal.fire({
+                  title: 'Error',
+                  text: mensajeError, // <--- CAMBIADO AQUÍ para ver el diagnóstico real
+                  icon: 'error',
+                  confirmButtonColor: '#d33'
+    });
         }
+        
     };
 
   return (

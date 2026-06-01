@@ -74,8 +74,8 @@ const Dashboard = () => {
                         <img src={Libros_dash} alt="imagen de libros" className="w-full h-full object-contain" />
                     </div>
                     <div className="stat-info flex flex-col gap-0.5 sm:gap-1">
-                        <span className="stat-label text-gray-500 text-xs sm:text-sm font-medium uppercase">Libros</span>
-                        <span className="stat-value text-xl sm:text-2xl font-bold text-slate-800">{data.totalLibros}</span>
+                        <span className="stat-label text-gray-500 text-xs sm:text-sm font-medium uppercase">Mantenimientos</span>
+                        <span className="stat-value text-xl sm:text-2xl font-bold text-slate-800">{data.itemsMantenimientos}</span>
                     </div>
                 </div>
 
@@ -85,8 +85,8 @@ const Dashboard = () => {
                         <img src={Deporte_dash} alt="imagen de deportes" className="w-full h-full object-contain" />
                     </div>
                     <div className="stat-info flex flex-col gap-0.5 sm:gap-1">
-                        <span className="stat-label text-gray-500 text-xs sm:text-sm font-medium uppercase">Deportes</span>
-                        <span className="stat-value text-xl sm:text-2xl font-bold text-slate-800">{data.itemsDeportes}</span>
+                        <span className="stat-label text-gray-500 text-xs sm:text-sm font-medium uppercase">Reportes</span>
+                        <span className="stat-value text-xl sm:text-2xl font-bold text-slate-800">{data.itemsReportes}</span>
                     </div>
                 </div>
                 </section>

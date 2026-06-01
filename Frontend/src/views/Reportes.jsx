@@ -1,13 +1,13 @@
 import React from 'react';
 
-function Deportes() {
+function Reportes() {
   return (
     <div>
-      <h1>Panel de deportes</h1>
+      <h1>Panel de reportes</h1>
       {/* Tu código aquí */}
     </div>
   );
 }
 
 
-export default Deportes;
+export default Reportes;

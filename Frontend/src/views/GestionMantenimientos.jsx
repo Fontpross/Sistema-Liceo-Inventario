@@ -3,7 +3,7 @@ import { Beaker, Plus, Trash2, Edit3, Save, AlertCircle, CheckCircle } from 'luc
 import { ApiRestSubLab } from '../Config/api';
 import Swal from 'sweetalert2';
 
-const GestionMTNS = () => {
+const GestionLab = () => {
     const [laboratorios, setLaboratorios] = useState([]);
     const [editando, setEditando] = useState(null);
     const [formData, setFormData] = useState({ nombre: '', estado: 'Activo' });
@@ -217,4 +217,4 @@ const GestionMTNS = () => {
     );
 };
 
-export default GestionMTNS;
+export default GestionLab;

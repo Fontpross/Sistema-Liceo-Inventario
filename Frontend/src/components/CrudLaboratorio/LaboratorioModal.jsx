@@ -10,18 +10,18 @@ const LaboratorioModal = ({ isOpen, onClose, onSave, equipoEditar }) => {
   const [formData, setFormData] = useState({
     id_pc: '',
     nombre_pc: '',
-    numero_laboratorio: 'Laboratorio 1',
+    numero_laboratorio: '',
     profesor_cargo: '',
     estado: 'Activo',
     especificaciones: {
       procesador: '',
       ram: '',
       almacenamiento: '',
-      tarjetaGrafica: ''
+      tarjeta_grafica: ''
     }
   });
 
-  // Efecto que nos ayuda a traer los profesores disponibles a cargo de los laboratorios
+  // Efecto que nos ayuda a traer la lista de los profesores disponibles a cargo de los laboratorios
   useEffect(() => {
     const cargarProfesores = async () => {
         try {
@@ -65,14 +65,14 @@ const LaboratorioModal = ({ isOpen, onClose, onSave, equipoEditar }) => {
     setFormData({
       id_pc: equipoEditar?.id_pc || '',
       nombre_pc: equipoEditar?.nombre_pc || '',
-      numero_laboratorio: equipoEditar?.numero_laboratorio || 'Laboratorio 1',
+      numero_laboratorio: equipoEditar?.numero_laboratorio || '',
       profesor_cargo: equipoEditar?.profesor_cargo || '',
       estado: equipoEditar?.estado || 'Activo',
       especificaciones: {
         procesador: equipoEditar?.especificaciones?.procesador || '',
         ram: equipoEditar?.especificaciones?.ram || '',
         almacenamiento: equipoEditar?.especificaciones?.almacenamiento || '',
-        tarjetaGrafica: equipoEditar?.especificaciones?.tarjetaGrafica || ''
+        tarjeta_grafica: equipoEditar?.especificaciones?.tarjeta_grafica || ''
         }
     });
   } else {
@@ -86,53 +86,49 @@ const LaboratorioModal = ({ isOpen, onClose, onSave, equipoEditar }) => {
         procesador: '',
         ram: '',
         almacenamiento: '',
-        tarjetaGrafica: ''
+        tarjeta_grafica: ''
         }
       });
     }
   }, [equipoEditar, isOpen]);
 
-  // Manejador de cambios para campos normales y anidados (especificaciones)
+
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    // 1. Definimos la regla para SKU / Nombre de PC
-    // Esta RegEx permite: letras (A-Z, a-z), números (0-9), guion (-), guion bajo (_), punto (.) y coma (,)
-    // ^[a-zA-Z0-9.\-_,]*$
+    // Validación para SKU y Nombre (permitimos letras, números, puntos, comas, guiones y guiones bajos, pero no espacios ni otros símbolos)
     const regexPermitido = /^[a-zA-Z0-9\_]*$/;
-
     if (name === 'id_pc' || name === 'nombre_pc') {
-      // Si el usuario intenta ingresar un carácter no permitido, no actualizamos el estado
       if (!regexPermitido.test(value)) {
         return; 
       }
     }
-
     
+    // Manejo de campos anidados como especificaciones.procesador, especificaciones.ram, etc.
     if (name.includes('.')) {
       const [parent, child] = name.split('.');
-
-      // RegEx para hardware: letras, números, espacios, puntos, comas, guiones y barras (/)
       const regexHardware = /^[a-zA-Z0-9 .\-_,/]*$/;
 
       if (parent === 'especificaciones' && !regexHardware.test(value)) {
-        return; // Bloquea si intentan meter caracteres como @, $, %, &, etc.
+        return; 
       }
       
       setFormData(prev => ({
         ...prev,
         [parent]: { ...prev[parent], [child]: value }
       }));
-    } else {
-      setFormData(prev => ({ ...prev, [name]: value }));
-    }
+      return; 
+    } 
+    
+    // Campos normales de la raíz
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Expresión regular para validar el formato final (no permite espacios ni caracteres raros)
-    const regexValidacion = /^[a-zA-Z0-9\_]+$/;
+    // POR ESTO (Incluye puntos, comas y guiones medios):
+    const regexValidacion = /^[a-zA-Z0-9.\-_,]+$/;
 
     if (!regexValidacion.test(formData.id_pc) || !regexValidacion.test(formData.nombre_pc)) {
       Swal.fire({
@@ -159,7 +155,7 @@ const LaboratorioModal = ({ isOpen, onClose, onSave, equipoEditar }) => {
           procesador: formData.especificaciones.procesador,
           ram: formData.especificaciones.ram,
           almacenamiento: formData.especificaciones.almacenamiento,
-          tarjetaGrafica: formData.especificaciones.tarjetaGrafica
+          tarjeta_grafica: formData.especificaciones.tarjeta_grafica
         }
       };
 
@@ -310,10 +306,19 @@ const LaboratorioModal = ({ isOpen, onClose, onSave, equipoEditar }) => {
                 'border-slate-200 bg-slate-50 text-slate-700 focus:ring-slate-500' // Para Inactivo
                 }`}
               >
-                <option value="Activo">🟢 Activo</option>
-                <option value="En Reparación">🟡 En Reparación</option>
-                <option value="Dañado">🔴 Dañado</option>
-                <option value="Inactivo">⚪ Inactivo</option>
+              {!equipoEditar ? (
+                <>
+                  <option value="Activo">🟢 Activo</option>
+                  <option value="Inactivo">⚪ Inactivo</option>
+                </>
+              ) : (
+                <>
+                  <option value="Activo">🟢 Activo</option>
+                  <option value="En Reparación">🟡 En Reparación</option>
+                  <option value="Dañado">🔴 Dañado</option>
+                  <option value="Inactivo">⚪ Inactivo</option>
+                </>
+              )}
               </select>
             </div>
           </div>
@@ -336,30 +341,40 @@ const LaboratorioModal = ({ isOpen, onClose, onSave, equipoEditar }) => {
               </div>
               <div className="flex items-center gap-2">
                 <Database className="text-slate-400" size={18} />
-                <input
+                <select
                   name="especificaciones.ram"
                   placeholder="Memoria RAM"
                   value={formData.especificaciones.ram}
                   onChange={handleChange}
                   className="flex-1 px-3 py-1.5 border rounded-md text-sm outline-none focus:border-indigo-500"
-                />
+                >
+                  <option value="" disabled >Seleccionar RAM</option>
+                  <option value="8 GB">8 GB</option>
+                  <option value="16 GB">16 GB</option>
+                  <option value="32 GB">32 GB</option>
+                </select>
               </div>
               <div className="flex items-center gap-2">
                 <HardDrive className="text-slate-400" size={18} />
-                <input
+                <select
                   name="especificaciones.almacenamiento"
                   placeholder="Disco Duro / SSD"
                   value={formData.especificaciones.almacenamiento}
                   onChange={handleChange}
                   className="flex-1 px-3 py-1.5 border rounded-md text-sm outline-none focus:border-indigo-500"
-                />
+                >
+                  <option value="" disabled>Seleccionar Almacenamiento</option>
+                  <option value="256 GB SSD">256 GB SSD</option>
+                  <option value="512 GB SSD">512 GB SSD</option>
+                  <option value="1 TB SSD">1 TB SSD</option>
+                </select>
               </div>
               <div className="flex items-center gap-2 text-sm">
                 <span className="font-bold text-slate-400">T/G:</span>
                 <input
-                  name="especificaciones.tarjetaGrafica"
+                  name="especificaciones.tarjeta_grafica"
                   placeholder="Tarjeta Grafica"
-                  value={formData.especificaciones.tarjetaGrafica}
+                  value={formData.especificaciones.tarjeta_grafica}
                   onChange={handleChange}
                   className="flex-1 px-3 py-1.5 border rounded-md text-sm outline-none focus:border-indigo-500"
                 />

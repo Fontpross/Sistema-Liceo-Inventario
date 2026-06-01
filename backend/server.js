@@ -17,6 +17,8 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/dashboard', require('./routes/dashboard'));
 app.use('/api/laboratorio', require('./routes/laboratorio'));
 app.use('/api/laboratorios', require('./routes/numero_lab'));
+app.use('/api/laboratorios', require('./routes/reportes'));
+app.use('/api/laboratorios', require('./routes/mantenimientos'));
 
 
 

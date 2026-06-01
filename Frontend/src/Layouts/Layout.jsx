@@ -10,8 +10,6 @@ const Layout = () => {
     return <Navigate to="/" replace />;
   }
 
-  
-
   return (
     <div className="flex min-h-screen"> 
       {/* El Sidebar se queda fijo a la izquierda */}

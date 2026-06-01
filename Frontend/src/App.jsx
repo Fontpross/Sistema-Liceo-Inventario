@@ -6,10 +6,9 @@ import Layout from './Layouts/Layout';
 import Login from './views/Login';
 import Dashboard from './views/Dashboard';
 import Laboratorio from './views/Laboratorio'
-import Biblioteca from './views/Biblioteca'
-import Deportes from './views/Deportes'
+import Reportes from './views/Reportes'
 import GestionLab from './views/GestionLaboratorios';
-
+import Mantenimientos from './views/GestionMantenimientos'
 
 // Importamos los estilos globales
 import './Css/Login.css';
@@ -36,9 +35,9 @@ function App() {
         >
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/laboratorio" element={<Laboratorio />} />
-          <Route path="/deportes" element={<Deportes />} />
-          <Route path="/biblioteca" element={<Biblioteca />} />
+          <Route path="/reportes" element={<Reportes />} />
           <Route path="/gestionLaboratorio" element={< GestionLab />} />
+          <Route path="/gestionMantenimientos" element={< Mantenimientos />} />
         </Route>
 
         {/* 6. Comodín: Si escriben cualquier otra cosa en la URL, los manda al Login */}
